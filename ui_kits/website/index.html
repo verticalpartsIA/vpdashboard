@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Vertical Parts — Website UI Kit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="Nav.jsx"></script>
+  <script type="text/babel" src="Hero.jsx"></script>
+  <script type="text/babel" src="ProductCatalog.jsx"></script>
+  <script type="text/babel" src="ProductDetail.jsx"></script>
+  <script type="text/babel" src="ClientArea.jsx"></script>
+  <script type="text/babel" src="Footer.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function HomePage({ go }) {
+      useEffect(() => { window.lucide && window.lucide.createIcons(); });
+      const features = [
+        { icon: 'gauge', title: 'Catálogo Inteligente', desc: '4.000+ peças catalogadas com filtros por equipamento e fabricante.' },
+        { icon: 'truck', title: 'Logística Industrial', desc: 'Entrega 2–5 dias úteis para todo o Brasil, com rastreio em tempo real.' },
+        { icon: 'wrench', title: 'Engenharia Aplicada', desc: 'Suporte técnico para identificação, compatibilidade e modernização.' },
+        { icon: 'shield-check', title: 'Garantia 12 Meses', desc: 'Componentes certificados, conformes às normas NBR e EN vigentes.' },
+      ];
+      return (
+        <React.Fragment>
+          <Hero go={go} />
+          <section className="vp-page" data-screen-label="01b Features">
+            <div className="vp-page__head">
+              <span className="vp-eyebrow vp-eyebrow--accent">Por que escolher Vertical Parts</span>
+              <h2 className="vp-h2">Tecnologia de ponta<br/>para sua operação</h2>
+            </div>
+            <div className="vp-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+              {features.map(f => (
+                <div key={f.title} className="vp-product" style={{ cursor: 'default' }}>
+                  <div className="vp-product__body" style={{ padding: '32px 24px', gap: 12 }}>
+                    <div style={{ width: 48, height: 48, background: 'rgba(245,196,0,0.12)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom: 8 }}>
+                      <i data-lucide={f.icon} style={{ width: 24, height: 24, color: '#000' }}></i>
+                    </div>
+                    <h3 className="vp-h4">{f.title}</h3>
+                    <p className="vp-body" style={{ fontSize: 13 }}>{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </React.Fragment>
+      );
+    }
+
+    function App() {
+      const [route, setRoute] = useState('home');
+      const [selected, setSelected] = useState(null);
+
+      const go = (r, payload) => {
+        if (r === 'product' && payload) setSelected(payload);
+        setRoute(r);
+        window.scrollTo(0, 0);
+      };
+
+      useEffect(() => { window.lucide && window.lucide.createIcons(); }, [route]);
+
+      const showChrome = route !== 'login';
+
+      let body;
+      if (route === 'home') body = <HomePage go={go} />;
+      else if (route === 'catalog' || route === 'equipamentos') body = <ProductCatalog go={go} />;
+      else if (route === 'product') body = <ProductDetail product={selected} go={go} />;
+      else if (route === 'login') body = <LoginScreen onLogin={() => go('client')} />;
+      else if (route === 'client') body = <ClientArea go={go} />;
+      else body = <ProductCatalog go={go} />;
+
+      return (
+        <React.Fragment>
+          {showChrome && route !== 'client' && <Nav current={route} go={r => r === 'client' ? go('login') : go(r)} />}
+          {route === 'client' && <Nav current={route} go={r => go(r === 'client' ? 'client' : r)} />}
+          {body}
+          {showChrome && <Footer />}
+        </React.Fragment>
+      );
+    }
+
+    setTimeout(() => {
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    }, 30);
+  </script>
+</body>
+</html>

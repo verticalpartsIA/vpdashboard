@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VerticalParts — Autenticação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --yellow: #F5C400;
+      --yellow-bright: #FFD400;
+      --yellow-deep: #C99E00;
+      --black: #000;
+      --ink: #0A0A0A;
+      --graphite: #161616;
+      --steel: #2A2A2A;
+      --gray-700: #4A4A4A;
+      --gray-500: #808080;
+      --gray-400: #A0A0A0;
+      --gray-300: #C9C9C9;
+      --gray-200: #E5E5E5;
+      --gray-100: #F2F2F2;
+      --gray-50:  #F9F9F9;
+      --white: #fff;
+      --success: #2E7D32;
+      --warning: #ED8C00;
+      --danger: #C62828;
+      --ease: cubic-bezier(0.4,0,0.2,1);
+      --shadow-yellow: 0 12px 28px rgba(245,196,0,0.30);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      background: var(--gray-100);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font-family: inherit; cursor: pointer; }
+    a { cursor: pointer; }
+
+    /* ============ Screen switcher (top of page) ============ */
+    .switcher {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 100;
+      background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
+      border: 1px solid var(--steel); border-radius: 4px;
+      padding: 4px;
+      display: flex; gap: 0;
+      box-shadow: var(--shadow-md);
+    }
+    .switcher button {
+      background: transparent; border: none; color: var(--gray-300);
+      padding: 8px 16px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      border-radius: 2px; transition: all .15s var(--ease);
+    }
+    .switcher button:hover { color: #fff; }
+    .switcher button.is-active { background: var(--yellow); color: #000; }
+
+    /* ============ Screens ============ */
+    .screen { display: none; min-height: 100vh; }
+    .screen.is-active { display: flex; }
+
+    /* ============ Split layout (login + register) ============ */
+    .split {
+      width: 100%;
+      display: grid; grid-template-columns: 1fr 1.05fr;
+      min-height: 100vh;
+    }
+    .split__left {
+      position: relative; overflow: hidden;
+      background: radial-gradient(circle at 30% 20%, #1c1c1c, #000 65%);
+      color: #fff;
+      padding: 56px 56px 48px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .split__left::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(245,196,0,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,196,0,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at 30% 30%, #000 40%, transparent 80%);
+      pointer-events: none;
+    }
+    .split__left::after {
+      content: ""; position: absolute;
+      right: -120px; top: 50%; transform: translateY(-50%);
+      width: 360px; height: 360px;
+      border: 2px solid rgba(245,196,0,0.18);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .split__brand { position: relative; z-index: 1; }
+    .split__brand img { height: 36px; }
+    .split__hero { position: relative; z-index: 1; }
+    .split__eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.18em; color: var(--yellow);
+    }
+    .split__eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--yellow); }
+    .split__hero h1 {
+      font-size: clamp(32px, 3vw, 44px); font-weight: 800;
+      line-height: 1.1; letter-spacing: -0.02em;
+      margin: 16px 0 18px;
+    }
+    .split__hero h1 b { color: var(--yellow); font-weight: 800; }
+    .split__hero p { font-size: 16px; line-height: 1.65; color: var(--gray-300); max-width: 440px; }
+    .split__features { display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
+    .split__feature { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--gray-300); }
+    .split__feature svg { color: var(--yellow); flex-shrink: 0; }
+    .split__foot {
+      position: relative; z-index: 1;
+      font-size: 11px; color: var(--gray-500);
+      text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600;
+    }
+
+    .split__right {
+      background: #fff;
+      padding: 56px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .form-card { width: 100%; max-width: 440px; }
+    .form-card.wide { max-width: 520px; }
+
+    /* ============ Centered layout (forgot + reset) ============ */
+    .centered {
+      width: 100%;
+      align-items: center; justify-content: center;
+      background: radial-gradient(circle at 80% 20%, #1c1c1c, #000 60%);
+      padding: 48px 24px;
+      position: relative; overflow: hidden;
+    }
+    .centered::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(245,196,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,196,0,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(circle at 50% 30%, #000 30%, transparent 70%);
+    }
+    .centered__card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 460px;
+      background: #fff;
+      border-radius: 6px;
+      padding: 48px 40px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      border-top: 4px solid var(--yellow);
+    }
+    .centered__logo { text-align: center; margin-bottom: 28px; }
+    .centered__logo img { height: 40px; display: inline-block; }
+
+    /* ============ Form elements ============ */
+    .form-head { margin-bottom: 32px; }
+    .form-head .eb {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.18em; color: var(--yellow-deep);
+    }
+    .form-head .eb::before { content: ""; width: 24px; height: 2px; background: var(--yellow); }
+    .form-head h2 {
+      font-size: 30px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em;
+      margin: 12px 0 8px;
+    }
+    .form-head p { font-size: 14px; color: var(--gray-700); line-height: 1.55; }
+
+    .field { margin-bottom: 18px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+    .field-row .field { margin-bottom: 0; }
+    .field label {
+      display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.16em;
+      color: var(--gray-700); margin-bottom: 8px;
+    }
+    .field .input-wrap { position: relative; }
+    .field .input-wrap svg.lead {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--gray-400); pointer-events: none;
+    }
+    .field input, .field select {
+      width: 100%; padding: 14px 14px 14px 42px;
+      border: 1px solid var(--gray-200); background: #fff;
+      font-family: inherit; font-size: 14px; color: var(--black);
+      border-radius: 4px; outline: none;
+      transition: all .15s var(--ease);
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(245,196,0,0.20);
+    }
+    .field input::placeholder { color: var(--gray-400); }
+    .field .toggle-pw {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--gray-500); padding: 4px;
+    }
+    .field.has-error input { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(198,40,40,0.15); }
+    .field.has-success input { border-color: var(--success); }
+    .field .help { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 6px; color: var(--gray-500); }
+    .field.has-error .help { color: var(--danger); }
+    .field.has-success .help { color: var(--success); }
+
+    /* Role selector */
+    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .role-opt {
+      position: relative; padding: 14px 10px;
+      border: 1px solid var(--gray-200); background: #fff;
+      border-radius: 4px; cursor: pointer; text-align: center;
+      transition: all .15s var(--ease);
+    }
+    .role-opt input { position: absolute; opacity: 0; pointer-events: none; }
+    .role-opt:hover { border-color: var(--gray-400); }
+    .role-opt.is-checked {
+      border-color: var(--yellow); border-width: 2px; padding: 13px 9px;
+      background: rgba(245,196,0,0.08);
+    }
+    .role-opt svg { color: var(--gray-700); margin-bottom: 6px; }
+    .role-opt.is-checked svg { color: var(--black); }
+    .role-opt .role-name {
+      display: block; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em; color: var(--black);
+    }
+    .role-opt .role-desc { display: block; font-size: 10px; color: var(--gray-500); margin-top: 2px; }
+
+    /* Strength bar */
+    .strength { margin-top: 8px; }
+    .strength__bars { display: flex; gap: 4px; }
+    .strength__bars span { flex: 1; height: 4px; background: var(--gray-200); border-radius: 2px; transition: background .2s; }
+    .strength__bars span.on-1 { background: var(--danger); }
+    .strength__bars span.on-2 { background: var(--warning); }
+    .strength__bars span.on-3 { background: var(--yellow); }
+    .strength__bars span.on-4 { background: var(--success); }
+    .strength__lbl {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 6px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--gray-500);
+    }
+    .strength__lbl .lvl-weak { color: var(--danger); }
+    .strength__lbl .lvl-fair { color: var(--warning); }
+    .strength__lbl .lvl-good { color: var(--yellow-deep); }
+    .strength__lbl .lvl-strong { color: var(--success); }
+
+    /* Btn */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px 20px; border: none; border-radius: 4px;
+      font-weight: 700; font-size: 14px; letter-spacing: 0.04em;
+      transition: all .2s var(--ease);
+    }
+    .btn--primary { background: var(--yellow); color: var(--black); }
+    .btn--primary:hover { background: var(--yellow-bright); transform: translateY(-2px); box-shadow: var(--shadow-yellow); }
+    .btn--primary:active { transform: translateY(0); }
+    .btn--ghost { background: transparent; color: var(--gray-700); border: 1px solid var(--gray-200); }
+    .btn--ghost:hover { border-color: var(--gray-400); }
+
+    /* Form bottom links */
+    .form-aux {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: -4px; margin-bottom: 22px;
+    }
+    .form-aux .remember { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-700); }
+    .form-aux .remember input { width: 16px; height: 16px; accent-color: var(--yellow); }
+    .form-aux a { color: var(--yellow-deep); font-size: 13px; font-weight: 600; text-decoration: none; }
+    .form-aux a:hover { color: var(--black); }
+
+    .form-bottom {
+      margin-top: 24px; text-align: center;
+      font-size: 13px; color: var(--gray-700);
+    }
+    .form-bottom a { color: var(--black); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--yellow); padding-bottom: 1px; }
+    .form-bottom a:hover { color: var(--yellow-deep); }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 24px 0;
+      color: var(--gray-500); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.16em;
+    }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--gray-200); }
+
+    .alert {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 16px; border-radius: 4px;
+      margin-bottom: 22px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .alert--success { background: rgba(46,125,50,0.08); border-left: 3px solid var(--success); color: #1B5E20; }
+    .alert--info { background: rgba(245,196,0,0.10); border-left: 3px solid var(--yellow); color: var(--gray-700); }
+    .alert svg { flex-shrink: 0; margin-top: 1px; }
+    .alert strong { display: block; color: var(--black); margin-bottom: 2px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--gray-700);
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--black); }
+
+    .pw-rules { margin-top: 12px; display: grid; gap: 4px; }
+    .pw-rule { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray-500); }
+    .pw-rule svg { width: 14px; height: 14px; color: var(--gray-400); }
+    .pw-rule.ok { color: var(--success); }
+    .pw-rule.ok svg { color: var(--success); }
+
+    @media (max-width: 900px) {
+      .split { grid-template-columns: 1fr; }
+      .split__left { padding: 32px; min-height: 280px; }
+      .split__left::after { display: none; }
+      .split__right { padding: 32px 24px; }
+      .field-row { grid-template-columns: 1fr; }
+      .role-grid { grid-template-columns: 1fr; }
+      .switcher { padding: 3px; }
+      .switcher button { padding: 7px 10px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen switcher -->
+  <div class="switcher" role="tablist">
+    <button data-screen="login" class="is-active">Login</button>
+    <button data-screen="register">Register</button>
+    <button data-screen="forgot">Forgot</button>
+    <button data-screen="reset">Reset</button>
+  </div>
+
+  <!-- ============ SCREEN 1 — LOGIN ============ -->
+  <main class="screen is-active" id="screen-login" data-screen-label="01 Login">
+    <div class="split">
+      <aside class="split__left">
+        <div class="split__brand">
+          <img src="assets/logo-verticalparts-white.png" alt="VerticalParts" />
+        </div>
+        <div class="split__hero">
+          <span class="split__eyebrow">Plataforma B2B</span>
+          <h1>Bem-vindo<br/>de volta à <b>VerticalParts</b>.</h1>
+          <p>Acesse dashboards, controle de estoque e relatórios técnicos em um só lugar.</p>
+          <div class="split__features">
+            <div class="split__feature"><i data-lucide="check" style="width:18px;height:18px"></i> Mais de 4.000 SKUs catalogados</div>
+            <div class="split__feature"><i data-lucide="check" style="width:18px;height:18px"></i> Suporte técnico em até 24h</div>
+            <div class="split__feature"><i data-lucide="check" style="width:18px;height:18px"></i> Integração com Supabase Auth</div>
+          </div>
+        </div>
+        <div class="split__foot">© 2025 VerticalParts · v2.0</div>
+      </aside>
+
+      <section class="split__right">
+        <div class="form-card">
+          <div class="form-head">
+            <span class="eb">Acessar Conta</span>
+            <h2>Entrar na plataforma</h2>
+            <p>Use seu e-mail corporativo e senha cadastrados.</p>
+          </div>
+
+          <form id="form-login" novalidate>
+            <div class="field">
+              <label for="login-email">E-mail</label>
+              <div class="input-wrap">
+                <i data-lucide="mail" class="lead" style="width:16px;height:16px"></i>
+                <input id="login-email" type="email" name="email" placeholder="seu@email.com.br" autocomplete="email" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="login-password">Senha</label>
+              <div class="input-wrap">
+                <i data-lucide="lock" class="lead" style="width:16px;height:16px"></i>
+                <input id="login-password" type="password" name="password" placeholder="••••••••••" autocomplete="current-password" required />
+                <button type="button" class="toggle-pw" data-toggle="login-password" aria-label="Mostrar senha">
+                  <i data-lucide="eye" style="width:16px;height:16px"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-aux">
+              <label class="remember"><input type="checkbox" /> Lembrar de mim</label>
+              <a data-go="forgot">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit" class="btn btn--primary">
+              Entrar
+              <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+            </button>
+
+            <div class="form-bottom">
+              Não tem uma conta? <a data-go="register">Cadastrar</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============ SCREEN 2 — REGISTER ============ -->
+  <main class="screen" id="screen-register" data-screen-label="02 Register">
+    <div class="split">
+      <aside class="split__left">
+        <div class="split__brand">
+          <img src="assets/logo-verticalparts-white.png" alt="VerticalParts" />
+        </div>
+        <div class="split__hero">
+          <span class="split__eyebrow">Crie sua conta</span>
+          <h1>Comece a operar com a <b>VerticalParts</b>.</h1>
+          <p>Cadastre sua empresa em minutos e tenha acesso a estoque, preços e suporte de engenharia.</p>
+          <div class="split__features">
+            <div class="split__feature"><i data-lucide="check" style="width:18px;height:18px"></i> Aprovação de cadastro em 24h</div>
+            <div class="split__feature"><i data-lucide="check" style="width:18px;height:18px"></i> Linha de crédito pré-aprovada</div>
+            <div class="split__feature"><i data-lucide="check" style="width:18px;height:18px"></i> Dashboards segmentados por papel</div>
+          </div>
+        </div>
+        <div class="split__foot">© 2025 VerticalParts · v2.0</div>
+      </aside>
+
+      <section class="split__right">
+        <div class="form-card wide">
+          <div class="form-head">
+            <span class="eb">Novo cadastro</span>
+            <h2>Criar sua conta</h2>
+            <p>Preencha os dados para liberar o acesso à plataforma.</p>
+          </div>
+
+          <form id="form-register" novalidate>
+            <div class="field">
+              <label for="reg-name">Nome completo</label>
+              <div class="input-wrap">
+                <i data-lucide="user" class="lead" style="width:16px;height:16px"></i>
+                <input id="reg-name" type="text" name="full_name" placeholder="João da Silva" autocomplete="name" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="reg-email">E-mail corporativo</label>
+              <div class="input-wrap">
+                <i data-lucide="mail" class="lead" style="width:16px;height:16px"></i>
+                <input id="reg-email" type="email" name="email" placeholder="joao@empresa.com.br" autocomplete="email" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="reg-company">Nome da empresa</label>
+              <div class="input-wrap">
+                <i data-lucide="building-2" class="lead" style="width:16px;height:16px"></i>
+                <input id="reg-company" type="text" name="company_name" placeholder="Manutenções Silva Ltda" autocomplete="organization" required />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="reg-pw">Senha</label>
+                <div class="input-wrap">
+                  <i data-lucide="lock" class="lead" style="width:16px;height:16px"></i>
+                  <input id="reg-pw" type="password" name="password" placeholder="••••••••••" autocomplete="new-password" required />
+                  <button type="button" class="toggle-pw" data-toggle="reg-pw" aria-label="Mostrar senha">
+                    <i data-lucide="eye" style="width:16px;height:16px"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="reg-pw2">Confirmar senha</label>
+                <div class="input-wrap">
+                  <i data-lucide="lock" class="lead" style="width:16px;height:16px"></i>
+                  <input id="reg-pw2" type="password" name="password_confirm" placeholder="••••••••••" autocomplete="new-password" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Função na empresa <span style="color:var(--gray-400);font-weight:600;letter-spacing:0">(role)</span></label>
+              <div class="role-grid" id="role-grid">
+                <label class="role-opt is-checked" data-role="strategic">
+                  <input type="radio" name="role" value="strategic" checked />
+                  <i data-lucide="target" style="width:22px;height:22px"></i>
+                  <span class="role-name">Estratégico</span>
+                  <span class="role-desc">Visão executiva</span>
+                </label>
+                <label class="role-opt" data-role="analytical">
+                  <input type="radio" name="role" value="analytical" />
+                  <i data-lucide="bar-chart-3" style="width:22px;height:22px"></i>
+                  <span class="role-name">Analítico</span>
+                  <span class="role-desc">Relatórios e KPIs</span>
+                </label>
+                <label class="role-opt" data-role="operational">
+                  <input type="radio" name="role" value="operational" />
+                  <i data-lucide="wrench" style="width:22px;height:22px"></i>
+                  <span class="role-name">Operacional</span>
+                  <span class="role-desc">Pedidos e estoque</span>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn--primary" style="margin-top:8px">
+              Criar conta
+              <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+            </button>
+
+            <div class="form-bottom">
+              Já tem uma conta? <a data-go="login">Entrar</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============ SCREEN 3 — FORGOT PASSWORD ============ -->
+  <main class="screen centered" id="screen-forgot" data-screen-label="03 Forgot Password">
+    <div class="centered__card">
+      <div class="centered__logo">
+        <img src="assets/logo-verticalparts-color.png" alt="VerticalParts" />
+      </div>
+      <div class="form-head" style="text-align:center;margin-bottom:24px">
+        <span class="eb" style="justify-content:center">Recuperar acesso</span>
+        <h2>Esqueceu a senha?</h2>
+        <p>Informe o e-mail cadastrado e enviaremos um link para redefinir sua senha.</p>
+      </div>
+
+      <div class="alert alert--info" id="forgot-alert" hidden>
+        <i data-lucide="mail-check" style="width:18px;height:18px;color:var(--yellow-deep)"></i>
+        <div><strong>Link enviado.</strong>Confira sua caixa de entrada e siga as instruções nos próximos 30 minutos.</div>
+      </div>
+
+      <form id="form-forgot" novalidate>
+        <div class="field">
+          <label for="fp-email">E-mail</label>
+          <div class="input-wrap">
+            <i data-lucide="mail" class="lead" style="width:16px;height:16px"></i>
+            <input id="fp-email" type="email" name="email" placeholder="seu@email.com.br" autocomplete="email" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn--primary">
+          Enviar link de redefinição
+          <i data-lucide="send" style="width:16px;height:16px"></i>
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:22px">
+        <a class="back-link" data-go="login">
+          <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+          Voltar para o login
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ SCREEN 4 — RESET PASSWORD ============ -->
+  <main class="screen centered" id="screen-reset" data-screen-label="04 Reset Password">
+    <div class="centered__card">
+      <div class="centered__logo">
+        <img src="assets/logo-verticalparts-color.png" alt="VerticalParts" />
+      </div>
+      <div class="form-head" style="text-align:center;margin-bottom:24px">
+        <span class="eb" style="justify-content:center">Nova Senha</span>
+        <h2>Defina sua nova senha</h2>
+        <p>Escolha uma senha forte. Você fará login com ela em seguida.</p>
+      </div>
+
+      <form id="form-reset" novalidate>
+        <div class="field">
+          <label for="rp-pw">Nova senha</label>
+          <div class="input-wrap">
+            <i data-lucide="lock-keyhole" class="lead" style="width:16px;height:16px"></i>
+            <input id="rp-pw" type="password" name="password" placeholder="••••••••••" autocomplete="new-password" required />
+            <button type="button" class="toggle-pw" data-toggle="rp-pw" aria-label="Mostrar senha">
+              <i data-lucide="eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+          <div class="strength" id="rp-strength">
+            <div class="strength__bars"><span></span><span></span><span></span><span></span></div>
+            <div class="strength__lbl">
+              <span>Força da senha</span>
+              <span class="strength-text">—</span>
+            </div>
+          </div>
+          <div class="pw-rules" id="rp-rules">
+            <div class="pw-rule" data-rule="len"><i data-lucide="circle"></i> Mínimo de 8 caracteres</div>
+            <div class="pw-rule" data-rule="upper"><i data-lucide="circle"></i> Letra maiúscula</div>
+            <div class="pw-rule" data-rule="num"><i data-lucide="circle"></i> Pelo menos um número</div>
+            <div class="pw-rule" data-rule="sym"><i data-lucide="circle"></i> Caractere especial</div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:18px">
+          <label for="rp-pw2">Confirmar nova senha</label>
+          <div class="input-wrap">
+            <i data-lucide="lock-keyhole" class="lead" style="width:16px;height:16px"></i>
+            <input id="rp-pw2" type="password" name="password_confirm" placeholder="••••••••••" autocomplete="new-password" required />
+          </div>
+          <div class="help" id="rp-match" hidden>
+            <i data-lucide="check-circle-2" style="width:14px;height:14px"></i>
+            As senhas coincidem.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn--primary" style="margin-top:8px">
+          Atualizar senha
+          <i data-lucide="check" style="width:16px;height:16px"></i>
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:22px">
+        <a class="back-link" data-go="login">
+          <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+          Voltar para o login
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ----- Screen switching -----
+    const screens = ['login','register','forgot','reset'];
+    function show(s) {
+      screens.forEach(name => {
+        document.getElementById('screen-' + name).classList.toggle('is-active', name === s);
+      });
+      document.querySelectorAll('.switcher button').forEach(b => {
+        b.classList.toggle('is-active', b.dataset.screen === s);
+      });
+      window.scrollTo(0, 0);
+    }
+    document.querySelectorAll('.switcher button').forEach(b => {
+      b.addEventListener('click', () => show(b.dataset.screen));
+    });
+    document.querySelectorAll('[data-go]').forEach(el => {
+      el.addEventListener('click', e => { e.preventDefault(); show(el.dataset.go); });
+    });
+
+    // ----- Password toggle -----
+    document.querySelectorAll('.toggle-pw').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.toggle);
+        const isPw = input.type === 'password';
+        input.type = isPw ? 'text' : 'password';
+        btn.innerHTML = '';
+        const icon = document.createElement('i');
+        icon.setAttribute('data-lucide', isPw ? 'eye-off' : 'eye');
+        icon.style.width = '16px'; icon.style.height = '16px';
+        btn.appendChild(icon);
+        if (window.lucide) lucide.createIcons();
+      });
+    });
+
+    // ----- Role selector -----
+    document.querySelectorAll('#role-grid .role-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('#role-grid .role-opt').forEach(o => o.classList.remove('is-checked'));
+        opt.classList.add('is-checked');
+        opt.querySelector('input').checked = true;
+      });
+    });
+
+    // ----- Password strength -----
+    function scorePassword(pw) {
+      let score = 0;
+      const rules = {
+        len: pw.length >= 8,
+        upper: /[A-Z]/.test(pw),
+        num: /\d/.test(pw),
+        sym: /[^A-Za-z0-9]/.test(pw),
+      };
+      if (rules.len) score++;
+      if (rules.upper) score++;
+      if (rules.num) score++;
+      if (rules.sym) score++;
+      return { score, rules };
+    }
+    const rpPw = document.getElementById('rp-pw');
+    const rpPw2 = document.getElementById('rp-pw2');
+    const bars = document.querySelectorAll('#rp-strength .strength__bars span');
+    const strengthText = document.querySelector('#rp-strength .strength-text');
+    const labels = ['—', 'Fraca', 'Razoável', 'Boa', 'Forte'];
+    const labelClasses = ['', 'lvl-weak', 'lvl-fair', 'lvl-good', 'lvl-strong'];
+
+    function updateStrength() {
+      const pw = rpPw.value;
+      const { score, rules } = scorePassword(pw);
+      bars.forEach((bar, i) => {
+        bar.className = '';
+        if (pw && i < score) bar.classList.add('on-' + score);
+      });
+      strengthText.className = 'strength-text ' + (labelClasses[score] || '');
+      strengthText.textContent = pw ? labels[score] : '—';
+      Object.keys(rules).forEach(r => {
+        const el = document.querySelector('#rp-rules [data-rule="' + r + '"]');
+        if (!el) return;
+        el.classList.toggle('ok', rules[r]);
+        const icon = el.querySelector('i');
+        icon.setAttribute('data-lucide', rules[r] ? 'check-circle-2' : 'circle');
+      });
+      if (window.lucide) lucide.createIcons();
+      checkMatch();
+    }
+    function checkMatch() {
+      const match = rpPw.value && rpPw.value === rpPw2.value;
+      const help = document.getElementById('rp-match');
+      help.hidden = !match;
+      const f = rpPw2.closest('.field');
+      f.classList.toggle('has-success', !!match);
+    }
+    if (rpPw) rpPw.addEventListener('input', updateStrength);
+    if (rpPw2) rpPw2.addEventListener('input', checkMatch);
+
+    // ----- Supabase Auth integration shims (ready for wiring) -----
+    // These functions show where Supabase calls would go.
+    async function supabaseSignIn(email, password) {
+      // const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('[Supabase] signInWithPassword', { email });
+      return { ok: true };
+    }
+    async function supabaseSignUp(payload) {
+      // const { data, error } = await supabase.auth.signUp({
+      //   email: payload.email, password: payload.password,
+      //   options: { data: { full_name: payload.full_name, company_name: payload.company_name, role: payload.role } }
+      // });
+      console.log('[Supabase] signUp', payload);
+      return { ok: true };
+    }
+    async function supabaseResetEmail(email) {
+      // await supabase.auth.resetPasswordForEmail(email, { redirectTo: '...' });
+      console.log('[Supabase] resetPasswordForEmail', { email });
+      return { ok: true };
+    }
+    async function supabaseUpdatePassword(password) {
+      // await supabase.auth.updateUser({ password });
+      console.log('[Supabase] updateUser (password)', { len: password.length });
+      return { ok: true };
+    }
+
+    // ----- Forms -----
+    document.getElementById('form-login').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      supabaseSignIn(fd.get('email'), fd.get('password'));
+    });
+    document.getElementById('form-register').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const pw = fd.get('password'), pw2 = fd.get('password_confirm');
+      const f2 = document.getElementById('reg-pw2').closest('.field');
+      f2.classList.remove('has-error');
+      if (pw !== pw2) {
+        f2.classList.add('has-error');
+        let help = f2.querySelector('.help');
+        if (!help) { help = document.createElement('div'); help.className = 'help'; f2.appendChild(help); }
+        help.innerHTML = '<i data-lucide="alert-circle" style="width:14px;height:14px"></i> As senhas não coincidem.';
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+      supabaseSignUp({
+        full_name: fd.get('full_name'),
+        email: fd.get('email'),
+        password: pw,
+        company_name: fd.get('company_name'),
+        role: fd.get('role'),
+      });
+    });
+    document.getElementById('form-forgot').addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await supabaseResetEmail(fd.get('email'));
+      document.getElementById('forgot-alert').hidden = false;
+    });
+    document.getElementById('form-reset').addEventListener('submit', e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      if (fd.get('password') !== fd.get('password_confirm')) return;
+      supabaseUpdatePassword(fd.get('password'));
+    });
+
+    // ----- Initial Lucide -----
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>

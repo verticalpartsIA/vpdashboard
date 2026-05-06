@@ -1,0 +1,261 @@
+/* =============================================================
+   VERTICAL PARTS — Colors & Type Tokens
+   Industrial / technical / modern. Bold + clean typography.
+   ============================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* ---------- Brand palette (raw) ---------- */
+  --vp-yellow: #F5C400;        /* Primary accent — "PARTS" */
+  --vp-yellow-bright: #FFD400; /* Hover / highlight */
+  --vp-yellow-deep: #C99E00;   /* Pressed / dark state */
+  --vp-black: #000000;
+  --vp-ink: #0A0A0A;           /* Near-black surfaces */
+  --vp-graphite: #1A1A1A;      /* Cards on dark */
+  --vp-steel: #2A2A2A;         /* Borders on dark */
+  --vp-gray-900: #1F1F1F;
+  --vp-gray-700: #4A4A4A;
+  --vp-gray-500: #808080;      /* Brand gray — "VERTICAL" */
+  --vp-gray-400: #A0A0A0;
+  --vp-gray-300: #C9C9C9;
+  --vp-gray-200: #E5E5E5;
+  --vp-gray-100: #F2F2F2;
+  --vp-gray-50:  #F9F9F9;
+  --vp-white: #FFFFFF;
+
+  /* Status (used sparingly — industrial dashboards need them) */
+  --vp-success: #2E7D32;
+  --vp-success-tint: #E8F5E9;
+  --vp-info: #1565C0;
+  --vp-info-tint: #E3F2FD;
+  --vp-warning: #ED8C00;
+  --vp-warning-tint: #FFF4E0;
+  --vp-danger: #C62828;
+  --vp-danger-tint: #FDECEA;
+
+  /* ---------- Semantic surfaces ---------- */
+  --bg:           var(--vp-white);
+  --bg-subtle:    var(--vp-gray-50);
+  --bg-muted:     var(--vp-gray-100);
+  --bg-inverse:   var(--vp-black);
+  --bg-inverse-2: var(--vp-graphite);
+
+  /* Text */
+  --fg1: var(--vp-black);          /* Headings, primary text */
+  --fg2: var(--vp-gray-700);       /* Body */
+  --fg3: var(--vp-gray-500);       /* Muted / metadata */
+  --fg-on-yellow: var(--vp-black); /* Always black on yellow */
+  --fg-on-dark:   var(--vp-white);
+  --fg-on-dark-muted: var(--vp-gray-400);
+
+  /* Borders / dividers */
+  --border:        var(--vp-gray-200);
+  --border-strong: var(--vp-gray-300);
+  --border-dark:   var(--vp-steel);
+  --divider-yellow: var(--vp-yellow);
+
+  /* Accent */
+  --accent:        var(--vp-yellow);
+  --accent-hover:  var(--vp-yellow-bright);
+  --accent-press:  var(--vp-yellow-deep);
+  --accent-tint:   rgba(245, 196, 0, 0.10);
+
+  /* ---------- Typography ---------- */
+  --font-sans: 'Red Hat Display', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --font-display: 'Red Hat Display', sans-serif;
+
+  /* Type scale (industrial, slightly larger than typical web) */
+  --text-xs:   12px;
+  --text-sm:   14px;
+  --text-base: 16px;
+  --text-md:   18px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+  --text-3xl:  44px;
+  --text-4xl:  60px;
+  --text-5xl:  80px;
+
+  --leading-tight:  1.05;
+  --leading-snug:   1.2;
+  --leading-normal: 1.5;
+  --leading-loose:  1.65;
+
+  /* Weights — bold-heavy is intentional */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   600;
+  --weight-bold:     700;
+  --weight-black:    800;
+  --weight-ultra:    900;
+
+  /* Letter spacing — industrial caps lean wide-tracked */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.06em;
+  --tracking-uber:   0.18em; /* small caps labels */
+
+  /* ---------- Radii ---------- */
+  /* Industrial = mostly square corners. Subtle rounding only. */
+  --radius-none: 0;
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   10px;
+  --radius-pill: 999px;
+
+  /* ---------- Spacing (4-pt grid) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.14);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.20);
+  --shadow-yellow: 0 10px 24px rgba(245, 196, 0, 0.28);
+  --shadow-on-dark: 0 20px 48px rgba(0, 0, 0, 0.55);
+
+  /* ---------- Motion ---------- */
+  --ease-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-snap:  cubic-bezier(0.2, 0.9, 0.3, 1);
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   320ms;
+
+  /* ---------- Layout ---------- */
+  --container-narrow: 960px;
+  --container:        1200px;
+  --container-wide:   1400px;
+}
+
+/* =============================================================
+   Semantic typography — apply to elements directly
+   ============================================================= */
+
+.vp-base, body.vp {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: var(--fg2);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display — used for hero numbers, section openers */
+.vp-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-ultra);
+  font-size: clamp(48px, 6.5vw, var(--text-5xl));
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  color: var(--fg1);
+}
+
+.vp-h1 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-ultra);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  color: var(--fg1);
+}
+
+.vp-h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-black);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  color: var(--fg1);
+}
+
+.vp-h3 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--fg1);
+}
+
+.vp-h4 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  color: var(--fg1);
+}
+
+.vp-body {
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+  color: var(--fg2);
+}
+
+.vp-body-lg {
+  font-size: var(--text-md);
+  line-height: var(--leading-loose);
+  color: var(--fg2);
+}
+
+.vp-small {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--fg3);
+}
+
+/* Eyebrow — small, ALL CAPS, wide-tracked. Industrial signature. */
+.vp-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-black);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-uber);
+  color: var(--vp-gray-700);
+}
+.vp-eyebrow--accent { color: var(--accent-press); }
+
+.vp-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-feature-settings: "tnum";
+}
+
+/* Numeric / code — used for part numbers, SKUs, technical data */
+.vp-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Yellow accent stripe — used as section dividers */
+.vp-stripe {
+  height: 4px;
+  background: var(--accent);
+  width: 48px;
+  display: block;
+}
+
+/* Two-tone wordmark text style (matches logo treatment) */
+.vp-wordmark {
+  font-family: var(--font-display);
+  font-weight: var(--weight-ultra);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-tight);
+}
+.vp-wordmark .vp-vertical { color: var(--vp-gray-500); }
+.vp-wordmark .vp-parts    { color: var(--vp-yellow); }
